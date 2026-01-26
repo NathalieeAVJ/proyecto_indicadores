@@ -20,16 +20,19 @@
                 prepend-icon="mdi-account"
                 type="text"
                 required
+                @keyup.enter="focusPassword"
               ></v-text-field>
 
               <v-text-field
                 v-model="password"
+                ref="passwordField"
                 id="password"
                 label="Contraseña"
                 name="password"
                 prepend-icon="mdi-lock"
                 type="password"
                 required
+                @keyup.enter="handleLogin"
               ></v-text-field>
               
               <v-alert v-if="error" type="error" dense class="mt-2">
@@ -37,9 +40,8 @@
               </v-alert>
             </v-form>
           </v-card-text>
-          <v-card-actions>
-            <v-spacer></v-spacer>
-            <v-btn color="primary" :loading="loading" @click="handleLogin">Entrar</v-btn>
+          <v-card-actions class="px-8 pb-8">
+            <v-btn color="primary" block size="large" :loading="loading" @click="handleLogin" variant="elevated">Entrar</v-btn>
           </v-card-actions>
         </v-card>
       </v-col>
@@ -56,10 +58,19 @@ const username = ref('');
 const password = ref('');
 const loading = ref(false);
 const error = ref('');
+const passwordField = ref(null);
 const authStore = useAuthStore();
 const router = useRouter();
 
+const focusPassword = () => {
+  if (passwordField.value) {
+    passwordField.value.focus();
+  }
+};
+
 const handleLogin = async () => {
+  if (!username.value || !password.value) return;
+  
   loading.value = true;
   error.value = '';
   try {

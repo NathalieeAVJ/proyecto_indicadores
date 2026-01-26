@@ -11,10 +11,23 @@
     </v-row>
 
     <v-card elevation="2">
+      <v-card-title>
+        <v-text-field
+          v-model="search"
+          prepend-inner-icon="mdi-magnify"
+          label="Buscar empleado (Nombre, Cédula, Cargo...)"
+          single-line
+          hide-details
+          variant="solo-filled"
+          density="compact"
+          class="pa-2"
+        ></v-text-field>
+      </v-card-title>
       <v-data-table
         :headers="headers"
         :items="employees"
         :loading="loadingTable"
+        :search="search"
         class="elevation-0"
       >
         <template v-slot:item.status="{ item }">
@@ -25,12 +38,15 @@
         <template v-slot:item.rank="{ item }">
            {{ getRankLabel(item.rank) }}
         </template>
+        <template v-slot:item.department_ref="{ item }">
+           {{ item.department_detail?.name || '-' }}
+        </template>
         <template v-slot:item.actions="{ item }">
-          <v-btn icon size="small" variant="text" color="primary" @click="openDialog(item)">
+          <v-btn icon size="small" variant="text" color="primary" @click="openDialog(item)" title="Editar">
             <v-icon>mdi-pencil</v-icon>
           </v-btn>
-          <v-btn icon size="small" variant="text" color="error" @click="deleteItem(item)">
-            <v-icon>mdi-delete</v-icon>
+          <v-btn icon size="small" variant="text" color="error" @click="openBlacklistDialog(item)" title="Desincorporar a Lista Negra">
+            <v-icon>mdi-account-off</v-icon>
           </v-btn>
         </template>
       </v-data-table>
@@ -44,7 +60,7 @@
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text class="pa-6">
-          <v-form @submit.prevent="saveItem" ref="formRef">
+          <v-form @submit.prevent="saveItem" ref="formRef" id="employeeForm">
             <v-row>
               <v-col cols="12" md="6">
                 <v-text-field v-model="form.first_name" label="Nombre" required :rules="[v => !!v || 'Requerido']"></v-text-field>
@@ -53,7 +69,7 @@
                 <v-text-field v-model="form.last_name" label="Apellido" required :rules="[v => !!v || 'Requerido']"></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.dni" label="Cédula/ID" required :rules="[v => !!v || 'Requerido']"></v-text-field>
+                <v-text-field v-model="form.dni" label="Cédula" required :rules="[v => !!v || 'Requerido']"></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
                 <v-select
@@ -74,7 +90,14 @@
                 <v-text-field v-model="form.position" label="Cargo"></v-text-field>
               </v-col>
               <v-col cols="12" md="6">
-                <v-text-field v-model="form.department" label="Departamento"></v-text-field>
+                <v-select
+                  v-model="form.department_ref"
+                  :items="departments"
+                  item-title="name"
+                  item-value="id"
+                  label="Departamento Oficial"
+                  clearable
+                ></v-select>
               </v-col>
               <v-col cols="12" md="6">
                 <v-text-field v-model="form.hire_date" label="Fecha Ingreso" type="date"></v-text-field>
@@ -105,14 +128,45 @@
                 <v-textarea v-model="form.address" label="Dirección" rows="2"></v-textarea>
               </v-col>
             </v-row>
+            <!-- Hidden submit button for Enter support -->
+            <button type="submit" style="display:none"></button>
           </v-form>
         </v-card-text>
         <v-card-actions class="pa-4">
           <v-spacer></v-spacer>
           <v-btn color="grey" variant="text" @click="dialog = false">Cancelar</v-btn>
-          <v-btn color="primary" @click="saveItem" :loading="saving">
+          <v-btn color="primary" type="submit" form="employeeForm" :loading="saving">
             {{ isEdit ? 'Actualizar' : 'Guardar' }}
           </v-btn>
+        </v-card-actions>
+      </v-card>
+    </v-dialog>
+
+    <!-- BLACKLIST REASON DIALOG -->
+    <v-dialog v-model="blacklistDialog" max-width="500">
+      <v-card class="rounded-xl">
+        <v-card-title class="pa-4 bg-error text-white">
+            Desincorporar Personal
+        </v-card-title>
+        <v-card-text class="pa-6">
+            <p class="mb-4">¿Desea mover a <strong>{{ selectedForBlacklist?.first_name }} {{ selectedForBlacklist?.last_name }}</strong> a la lista negra?</p>
+            <v-textarea
+                v-model="blacklistReason"
+                label="Motivo de Desincorporación / Cese"
+                placeholder="Ej: Renuncia voluntaria, Despido justificado, etc."
+                variant="outlined"
+                rows="3"
+                hide-details
+            ></v-textarea>
+            <p class="text-caption text-grey mt-3 italic">
+                * El registro no se borrará, se mantendrá en el archivo histórico.<br>
+                * Sus accesos al sistema serán revocados inmediatamente.
+            </p>
+        </v-card-text>
+        <v-card-actions class="pa-4 px-6">
+            <v-spacer></v-spacer>
+            <v-btn variant="text" @click="blacklistDialog = false">Cancelar</v-btn>
+            <v-btn color="error" variant="elevated" @click="confirmBlacklist" :loading="savingBlacklist">Confirmar Salida</v-btn>
         </v-card-actions>
       </v-card>
     </v-dialog>
@@ -128,12 +182,17 @@ import { generatePDFReport } from '@/utils/reports';
 const authStore = useAuthStore();
 const employees = ref([]);
 const supervisors = ref([]);
+const search = ref('');
 const loadingTable = ref(true);
 const dialog = ref(false);
-const saving = ref(false);
 const isEdit = ref(false);
 const editedId = ref(null);
 const formRef = ref(null);
+
+const blacklistDialog = ref(false);
+const selectedForBlacklist = ref(null);
+const blacklistReason = ref('');
+const savingBlacklist = ref(false);
 
 const form = ref({
   first_name: '',
@@ -148,8 +207,11 @@ const form = ref({
   base_salary: 0,
   status: 'active',
   rank: 5,
-  supervisor: null
+  supervisor: null,
+  department_ref: null
 });
+
+const departments = ref([]);
 
 const hierarchyLevels = [
   { title: 'Presidente (0)', value: 0 },
@@ -165,12 +227,14 @@ const statuses = [
   { title: 'Vacaciones', value: 'vacation' },
   { title: 'Permiso', value: 'on_leave' },
   { title: 'Retirado', value: 'retired' },
+  { title: 'Lista Negra', value: 'blacklisted' },
 ];
 
 const headers = [
-  { title: 'DNI', key: 'dni' },
+  { title: 'Cédula', key: 'dni' },
   { title: 'Nombre', key: 'first_name' },
   { title: 'Apellido', key: 'last_name' },
+  { title: 'Departamento', key: 'department_ref' },
   { title: 'Cargo', key: 'position' },
   { title: 'Nivel', key: 'rank' },
   { title: 'Supervisor', key: 'supervisor_name' },
@@ -179,7 +243,7 @@ const headers = [
 ];
 
 const getStatusColor = (s) => {
-  const map = { active: 'success', vacation: 'info', on_leave: 'warning', retired: 'error' };
+  const map = { active: 'success', vacation: 'info', on_leave: 'warning', retired: 'orange', blacklisted: 'error' };
   return map[s] || 'grey';
 };
 
@@ -191,9 +255,13 @@ const getRankLabel = (r) => {
 const fetchEmployees = async () => {
   loadingTable.value = true;
   try {
-    const res = await api.get('employees/');
-    employees.value = res;
-    supervisors.value = res.map(e => ({ ...e, full_name: `${e.first_name} ${e.last_name}` }));
+    const [empRes, deptRes] = await Promise.all([
+      api.get('employees/'),
+      api.get('departments/')
+    ]);
+    employees.value = empRes;
+    supervisors.value = empRes.map(e => ({ ...e, full_name: `${e.first_name} ${e.last_name}` }));
+    departments.value = deptRes;
   } catch (e) {
     console.error(e);
   } finally {
@@ -239,15 +307,40 @@ const saveItem = async () => {
   }
 };
 
+const openBlacklistDialog = (item) => {
+    selectedForBlacklist.value = item;
+    blacklistReason.value = '';
+    blacklistDialog.value = true;
+};
+
+const confirmBlacklist = async () => {
+    if (!blacklistReason.value) {
+        alert('Debe especificar un motivo');
+        return;
+    }
+    savingBlacklist.value = true;
+    try {
+        await api.post(`employees/${selectedForBlacklist.value.id}/blacklist/`, {
+            reason: blacklistReason.value
+        });
+        blacklistDialog.value = false;
+        fetchEmployees();
+    } catch (e) {
+        alert('Error al desincorporar');
+    } finally {
+        savingBlacklist.value = false;
+    }
+};
+
 const deleteItem = async (item) => {
-  if (confirm(`¿Eliminar a ${item.first_name}?`)) {
+  if (confirm(`¿ELIMINAR PERMANENTEMENTE a ${item.first_name}? Esta acción no se recomienda, use Lista Negra.`)) {
     await api.delete(`employees/${item.id}/`);
     fetchEmployees();
   }
 };
 
 const exportEmployeesReport = async () => {
-    const reportHeaders = ['DNI', 'Nombre', 'Apellido', 'Cargo', 'Departamento', 'Estado'];
+    const reportHeaders = ['Cédula', 'Nombre', 'Apellido', 'Cargo', 'Departamento', 'Estado'];
     const body = employees.value.map(e => [
         e.dni, e.first_name, e.last_name, e.position, e.department, e.status.toUpperCase()
     ]);

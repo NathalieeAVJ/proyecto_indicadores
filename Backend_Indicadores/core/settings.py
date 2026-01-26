@@ -44,6 +44,11 @@ INSTALLED_APPS = [
     'users',
     'inventory',
     'rrhh',
+    'logistica',
+    'wiki',
+    'procura',
+    'documentos',
+    'ventas',
     'simple_history',
     'import_export',
 ]

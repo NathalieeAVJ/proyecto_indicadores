@@ -8,14 +8,20 @@
     </v-row>
 
     <v-row class="mt-4">
-      <v-col cols="12" md="3">
-        <v-select v-model="filterMonth" :items="months" label="Mes" @update:model-value="fetchPayroll"></v-select>
+      <v-col cols="12" md="2">
+        <v-select v-model="filterMonth" :items="months" label="Mes" hide-details density="compact" @update:model-value="fetchPayroll"></v-select>
       </v-col>
-      <v-col cols="12" md="3">
-        <v-text-field v-model="filterYear" label="Año" type="number" @change="fetchPayroll"></v-text-field>
+      <v-col cols="12" md="2">
+        <v-text-field v-model="filterYear" label="Año" type="number" hide-details density="compact" @change="fetchPayroll"></v-text-field>
       </v-col>
-      <v-col cols="12" md="6" class="d-flex align-center pt-5">
-        <v-btn color="error" prepend-icon="mdi-file-pdf-box" @click="exportPayrollReport" variant="tonal">Reporte General de Nómina</v-btn>
+      <v-col cols="12" md="4" class="d-flex align-center">
+        <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Buscar por nombre o Cédula..." hide-details density="compact" variant="solo-filled" class="mr-2"></v-text-field>
+      </v-col>
+      <v-col cols="12" md="3" class="d-flex align-center">
+        <v-btn color="error" block prepend-icon="mdi-file-pdf-box" @click="exportPayrollReport" variant="tonal">Reporte Nómina</v-btn>
+      </v-col>
+      <v-col cols="12" md="3" class="d-flex align-center">
+        <v-btn color="success" block prepend-icon="mdi-cash-check" @click="emitPaymentOrder" :disabled="payrolls.length === 0 || allPaid">Dar Orden de Pago</v-btn>
       </v-col>
     </v-row>
 
@@ -26,6 +32,7 @@
             :headers="headers"
             :items="payrolls"
             :loading="loading"
+            :search="search"
           >
             <template v-slot:item.net_salary="{ item }">
               <span class="font-weight-bold">${{ parseFloat(item.net_salary).toLocaleString() }}</span>
@@ -68,13 +75,15 @@ import { formatDate } from '@/utils/format';
 const authStore = useAuthStore();
 
 const payrolls = ref([]);
+const search = ref('');
 const loading = ref(true);
-const filterMonth = ref(12);
-const filterYear = ref(2026);
+const now = new Date();
+const filterMonth = ref(now.getMonth() + 1);
+const filterYear = ref(now.getFullYear());
 const showGenerationDialog = ref(false);
 const generating = ref(false);
-const genMonth = ref(1);
-const genYear = ref(2026);
+const genMonth = ref(now.getMonth() + 1);
+const genYear = ref(now.getFullYear());
 
 const months = [
   { title: 'Enero', value: 1 }, { title: 'Febrero', value: 2 }, { title: 'Marzo', value: 3 },
@@ -84,7 +93,7 @@ const months = [
 ];
 
 const headers = [
-  { title: 'Empleado', key: 'employee_detail.dni' },
+  { title: 'Cédula', key: 'employee_detail.dni' },
   { title: 'Nombre', key: 'employee_detail.first_name' },
   { title: 'Cargo', key: 'employee_detail.position' },
   { title: 'Sueldo Base', key: 'base_salary' },
@@ -92,6 +101,29 @@ const headers = [
   { title: 'Neto', key: 'net_salary' },
   { title: 'Estado', key: 'payment_status' },
 ];
+
+const allPaid = computed(() => {
+    return payrolls.value.length > 0 && payrolls.value.every(p => p.payment_status === 'paid');
+});
+
+const emitPaymentOrder = async () => {
+    if (!confirm('¿Está seguro de emitir la ORDEN DE PAGO para todo el personal en este periodo?')) return;
+    
+    loading.value = true;
+    try {
+        await api.post('payroll/bulk_pay/', {
+            month: filterMonth.value,
+            year: filterYear.value
+        });
+        await fetchPayroll();
+        alert('Orden de Pago emitida exitosamente. La nómina ha sido marcada como PAGADA.');
+    } catch (e) {
+        console.error(e);
+        alert('Error al emitir la orden de pago');
+    } finally {
+        loading.value = false;
+    }
+};
 
 const fetchPayroll = async () => {
   loading.value = true;
@@ -124,7 +156,7 @@ const generatePayroll = async () => {
 };
 
 const exportPayrollReport = async () => {
-    const headers = ['DNI', 'Empleado', 'Cargo', 'Sueldo', 'Bonos', 'Neto', 'Estado'];
+    const headers = ['Cédula', 'Empleado', 'Cargo', 'Sueldo', 'Bonos', 'Neto', 'Estado'];
     const body = payrolls.value.map(p => [
         p.employee_detail?.dni || 'N/A',
         `${p.employee_detail?.first_name} ${p.employee_detail?.last_name}`,

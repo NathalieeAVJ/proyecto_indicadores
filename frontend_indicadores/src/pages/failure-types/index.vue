@@ -11,7 +11,19 @@
     </v-row>
 
     <v-card>
-      <v-data-table :headers="headers" :items="items" :loading="loadingTable" class="elevation-1">
+      <v-card-title>
+        <v-text-field
+          v-model="search"
+          prepend-inner-icon="mdi-magnify"
+          label="Buscar tipo de falla..."
+          single-line
+          hide-details
+          variant="solo-filled"
+          density="compact"
+          class="pa-2"
+        ></v-text-field>
+      </v-card-title>
+      <v-data-table :headers="headers" :items="items" :loading="loadingTable" :search="search" class="elevation-1">
         <template v-slot:item.actions="{ item }">
           <v-btn icon size="small" variant="text" color="primary" class="me-2" @click="openDialog(item)">
             <v-icon>mdi-pencil</v-icon>
@@ -30,7 +42,7 @@
           {{ isEdit ? 'Editar Tipo de Falla' : 'Nuevo Tipo de Falla' }}
         </v-card-title>
         <v-card-text>
-          <v-form @submit.prevent="saveItem" ref="formRef">
+          <v-form @submit.prevent="saveItem" ref="formRef" id="failureTypeForm">
             <v-text-field
               v-model="form.name"
               label="Nombre del Tipo de Falla"
@@ -42,12 +54,13 @@
               label="Descripción"
               rows="3"
             ></v-textarea>
+            <button type="submit" style="display:none"></button>
           </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn variant="text" @click="dialog = false">Cancelar</v-btn>
-          <v-btn color="primary" @click="saveItem" :loading="saving">
+          <v-btn color="primary" type="submit" form="failureTypeForm" :loading="saving">
             {{ isEdit ? 'Actualizar' : 'Guardar' }}
           </v-btn>
         </v-card-actions>
@@ -61,6 +74,7 @@ import { ref, onMounted } from 'vue';
 import api from '@/services/api';
 
 const items = ref([]);
+const search = ref('');
 const loadingTable = ref(false);
 const dialog = ref(false);
 const saving = ref(false);

@@ -24,8 +24,20 @@
               item-value="value"
               label="Estado"
               clearable
+              hide-details
               @update:model-value="loadBudgets"
             ></v-select>
+          </v-col>
+          <v-col cols="12" md="8">
+            <v-text-field
+              v-model="search"
+              prepend-inner-icon="mdi-magnify"
+              label="Buscar presupuesto por título o descripción..."
+              single-line
+              hide-details
+              variant="solo-filled"
+              density="compact"
+            ></v-text-field>
           </v-col>
         </v-row>
       </v-card-text>
@@ -37,6 +49,7 @@
         :headers="headers"
         :items="budgets"
         :loading="loading"
+        :search="search"
         class="elevation-1"
       >
         <template v-slot:item.status="{ item }">
@@ -78,7 +91,7 @@
           </v-btn>
         </v-card-title>
         <v-card-text>
-          <v-form @submit.prevent="saveBudget" ref="formRef">
+          <v-form @submit.prevent="saveBudget(false)" ref="formRef" id="budgetForm">
             <v-text-field
               v-model="form.title"
               label="Título del Presupuesto"
@@ -97,7 +110,7 @@
             <v-divider class="my-4"></v-divider>
             <div class="d-flex justify-space-between align-center mb-3">
               <h3 class="text-subtitle-1 font-weight-bold">Repuestos a Solicitar</h3>
-              <v-btn variant="tonal" size="small" color="primary" @click="addItem">
+              <v-btn variant="tonal" size="small" color="primary" @click="addItem" type="button">
                 <v-icon start>mdi-plus</v-icon>
                 Agregar Item
               </v-btn>
@@ -149,7 +162,7 @@
                 </div>
               </v-col>
               <v-col cols="1" md="1" class="text-center">
-                <v-btn icon color="error" variant="text" size="x-small" @click="removeItem(index)" v-if="form.items.length > 1">
+                <v-btn icon color="error" variant="text" size="x-small" @click="removeItem(index)" v-if="form.items.length > 1" type="button">
                   <v-icon>mdi-delete</v-icon>
                 </v-btn>
               </v-col>
@@ -167,15 +180,16 @@
                 </v-card>
               </v-col>
             </v-row>
+            <button type="submit" style="display:none"></button>
           </v-form>
         </v-card-text>
         <v-card-actions class="pa-4">
           <v-spacer></v-spacer>
           <v-btn variant="text" @click="createDialog = false">Cancelar</v-btn>
-          <v-btn color="primary" @click="saveBudget(false)" :loading="saving">
+          <v-btn color="primary" type="submit" form="budgetForm" :loading="saving">
             Guardar Borrador
           </v-btn>
-          <v-btn color="success" @click="saveBudget(true)" :loading="saving">
+          <v-btn color="success" @click="saveBudget(true)" :loading="saving" type="button">
             Enviar para Aprobación
           </v-btn>
         </v-card-actions>
@@ -191,6 +205,7 @@ import api from '@/services/api';
 const budgets = ref([]);
 const spareParts = ref([]);
 const loading = ref(false);
+const search = ref('');
 const statusFilter = ref(null);
 
 const createDialog = ref(false);

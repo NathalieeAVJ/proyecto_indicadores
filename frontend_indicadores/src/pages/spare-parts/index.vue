@@ -135,7 +135,7 @@
           {{ isEdit ? 'Editar Repuesto' : 'Nuevo Repuesto' }}
         </v-card-title>
         <v-card-text>
-          <v-form @submit.prevent="savePart" ref="formRef">
+          <v-form @submit.prevent="savePart" ref="formRef" id="partForm">
             <v-row>
               <v-col cols="12" md="4">
                 <v-text-field
@@ -211,12 +211,13 @@
                 ></v-text-field>
               </v-col>
             </v-row>
+            <button type="submit" style="display:none"></button>
           </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn variant="text" @click="formDialog = false">Cancelar</v-btn>
-          <v-btn color="primary" @click="savePart" :loading="saving">
+          <v-btn color="primary" type="submit" form="partForm" :loading="saving">
             {{ isEdit ? 'Actualizar' : 'Guardar' }}
           </v-btn>
         </v-card-actions>
@@ -226,21 +227,24 @@
     <!-- Add Stock Dialog -->
     <v-dialog v-model="addStockDialog" max-width="400">
       <v-card>
-        <v-card-title>Agregar Stock</v-card-title>
-        <v-card-text>
-          <p class="mb-4 font-weight-bold">{{ selectedPart?.name }}</p>
-          <v-text-field
-            v-model.number="stockToAdd"
-            label="Cantidad a agregar"
-            type="number"
-            min="1"
-          ></v-text-field>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn variant="text" @click="addStockDialog = false">Cancelar</v-btn>
-          <v-btn color="primary" @click="addStock" :loading="addingStock">Agregar</v-btn>
-        </v-card-actions>
+        <v-form @submit.prevent="addStock" id="addBulkStockForm">
+            <v-card-title>Agregar Stock</v-card-title>
+            <v-card-text>
+              <p class="mb-4 font-weight-bold">{{ selectedPart?.name }}</p>
+              <v-text-field
+                v-model.number="stockToAdd"
+                label="Cantidad a agregar"
+                type="number"
+                min="1"
+              ></v-text-field>
+              <button type="submit" style="display:none"></button>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn variant="text" @click="addStockDialog = false">Cancelar</v-btn>
+              <v-btn color="primary" type="submit" form="addBulkStockForm" :loading="addingStock">Agregar</v-btn>
+            </v-card-actions>
+        </v-form>
       </v-card>
     </v-dialog>
   </v-container>

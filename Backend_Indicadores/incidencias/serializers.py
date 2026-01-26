@@ -1,5 +1,13 @@
 from rest_framework import serializers
-from .models import Incident, FailureType, RadioBaseIncident
+from .models import Incident, FailureType, RadioBaseIncident, IncidentAudit
+class IncidentAuditSerializer(serializers.ModelSerializer):
+    evaluator_name = serializers.CharField(source='evaluator.username', read_only=True)
+    
+    class Meta:
+        model = IncidentAudit
+        fields = '__all__'
+        read_only_fields = ['evaluator', 'assignment_time_seconds', 'resolution_time_seconds', 'bonus_approved']
+
 from users.serializers import UserSerializer
 from inventory.serializers import PhoneNumberSerializer, RadioBaseSerializer
 

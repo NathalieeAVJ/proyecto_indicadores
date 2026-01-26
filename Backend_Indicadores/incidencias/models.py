@@ -1,4 +1,5 @@
 from django.db import models
+from django.utils import timezone
 from django.conf import settings
 from inventory.models import PhoneNumber, RadioBase
 from simple_history.models import HistoricalRecords
@@ -27,6 +28,7 @@ class Incident(models.Model):
     # Fechas
     start_date = models.DateTimeField(verbose_name="Fecha de Inicio de Falla")
     review_date = models.DateTimeField(null=True, blank=True, verbose_name="Fecha de Revisión")
+    assigned_at = models.DateTimeField(null=True, blank=True, verbose_name="Fecha de Asignación")
     solved_date = models.DateTimeField(null=True, blank=True, verbose_name="Fecha Solucionada")
     
     # Usuarios
@@ -39,6 +41,15 @@ class Incident(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     history = HistoricalRecords()
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old_instance = Incident.objects.filter(pk=self.pk).first()
+            if old_instance and not old_instance.assigned_to and self.assigned_to:
+                self.assigned_at = timezone.now()
+        elif self.assigned_to:
+            self.assigned_at = timezone.now()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"#{self.id} - {self.title} ({self.get_status_display()})"
@@ -59,6 +70,7 @@ class RadioBaseIncident(models.Model):
     # Fechas
     start_date = models.DateTimeField(verbose_name="Fecha de Inicio de Falla")
     review_date = models.DateTimeField(null=True, blank=True, verbose_name="Fecha de Revisión")
+    assigned_at = models.DateTimeField(null=True, blank=True, verbose_name="Fecha de Asignación")
     solved_date = models.DateTimeField(null=True, blank=True, verbose_name="Fecha Solucionada")
     
     # Usuarios
@@ -71,6 +83,15 @@ class RadioBaseIncident(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     history = HistoricalRecords()
+
+    def save(self, *args, **kwargs):
+        if self.pk:
+            old_instance = RadioBaseIncident.objects.filter(pk=self.pk).first()
+            if old_instance and not old_instance.assigned_to and self.assigned_to:
+                self.assigned_at = timezone.now()
+        elif self.assigned_to:
+            self.assigned_at = timezone.now()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"RB-#{self.id} - {self.title} ({self.get_status_display()})"
@@ -114,3 +135,29 @@ class WorkOrder(models.Model):
     class Meta:
         verbose_name = "Orden de Trabajo"
         verbose_name_plural = "Órdenes de Trabajo"
+
+class IncidentAudit(models.Model):
+    incident = models.OneToOneField(Incident, on_delete=models.CASCADE, related_name='audit', verbose_name="Incidencia")
+    evaluator = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, related_name='audits_performed', verbose_name="Evaluador")
+    
+    support_score = models.IntegerField(verbose_name="Calificación Soporte (1-100)")
+    technician_score = models.IntegerField(verbose_name="Calificación Técnico (1-100)")
+    
+    suggested_bonus = models.DecimalField(max_digits=10, decimal_places=2, default=0, verbose_name="Bono Sugerido ($)")
+    bonus_approved = models.BooleanField(default=False, verbose_name="Bono Aprobado")
+    
+    comments = models.TextField(blank=True, verbose_name="Observaciones de Auditoría")
+    
+    # Metricas calculadas al momento (snapshot)
+    assignment_time_seconds = models.IntegerField(null=True, blank=True)
+    resolution_time_seconds = models.IntegerField(null=True, blank=True)
+    
+    created_at = models.DateTimeField(auto_now_add=True)
+    history = HistoricalRecords()
+
+    def __str__(self):
+        return f"Auditoría Incident #{self.incident.id} - Score: {self.support_score}/{self.technician_score}"
+
+    class Meta:
+        verbose_name = "Auditoría de Incidencia"
+        verbose_name_plural = "Auditorías de Incidencias"

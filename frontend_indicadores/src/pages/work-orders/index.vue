@@ -3,7 +3,10 @@
     <v-row>
       <v-col class="d-flex justify-space-between align-center">
         <h1 class="text-h4">Órdenes de Trabajo</h1>
-        <v-btn color="error" prepend-icon="mdi-file-pdf-box" @click="exportWorkOrdersReport" variant="tonal">Reporte de Servicios</v-btn>
+        <div class="d-flex align-center">
+          <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Buscar OT..." hide-details density="compact" variant="solo-filled" class="mr-4" style="width: 300px;"></v-text-field>
+          <v-btn color="error" prepend-icon="mdi-file-pdf-box" @click="exportWorkOrdersReport" variant="tonal">Reporte PDF</v-btn>
+        </div>
       </v-col>
     </v-row>
 
@@ -14,6 +17,7 @@
             :headers="headers"
             :items="orders"
             :loading="loading"
+            :search="search"
             class="elevation-0"
           >
             <template v-slot:item.incident_type="{ item }">
@@ -38,33 +42,36 @@
     <!-- View/Edit Order Dialog -->
     <v-dialog v-model="showDialog" max-width="700px">
         <v-card v-if="selectedOrder" title="Detalle de OT">
-            <v-card-text>
-                <v-row>
-                    <v-col cols="12"><h3 class="text-subtitle-1 mb-2">Checklist de Verificación</h3></v-col>
-                    <v-col cols="12" md="4">
-                        <v-checkbox v-model="selectedOrder.checked_power" label="Energía Verificada"></v-checkbox>
-                    </v-col>
-                    <v-col cols="12" md="4">
-                        <v-checkbox v-model="selectedOrder.checked_wiring" label="Cableado OK"></v-checkbox>
-                    </v-col>
-                    <v-col cols="12" md="4">
-                        <v-checkbox v-model="selectedOrder.checked_config" label="Software/Config OK"></v-checkbox>
-                    </v-col>
-                    
-                    <v-col cols="12">
-                        <v-select v-model="selectedOrder.status" :items="statuses" label="Estado de la Orden"></v-select>
-                    </v-col>
-                    
-                    <v-col cols="12">
-                        <v-textarea v-model="selectedOrder.technician_notes" label="Notas Técnicas de Campo" rows="3"></v-textarea>
-                    </v-col>
-                </v-row>
-            </v-card-text>
-            <v-card-actions>
-                <v-spacer></v-spacer>
-                <v-btn @click="showDialog = false">Cerrar</v-btn>
-                <v-btn color="primary" @click="saveOrder" :loading="saving">Guardar Avances</v-btn>
-            </v-card-actions>
+            <v-form @submit.prevent="saveOrder" id="otForm">
+                <v-card-text>
+                    <v-row>
+                        <v-col cols="12"><h3 class="text-subtitle-1 mb-2">Checklist de Verificación</h3></v-col>
+                        <v-col cols="12" md="4">
+                            <v-checkbox v-model="selectedOrder.checked_power" label="Energía Verificada"></v-checkbox>
+                        </v-col>
+                        <v-col cols="12" md="4">
+                            <v-checkbox v-model="selectedOrder.checked_wiring" label="Cableado OK"></v-checkbox>
+                        </v-col>
+                        <v-col cols="12" md="4">
+                            <v-checkbox v-model="selectedOrder.checked_config" label="Software/Config OK"></v-checkbox>
+                        </v-col>
+                        
+                        <v-col cols="12">
+                            <v-select v-model="selectedOrder.status" :items="statuses" label="Estado de la Orden"></v-select>
+                        </v-col>
+                        
+                        <v-col cols="12">
+                            <v-textarea v-model="selectedOrder.technician_notes" label="Notas Técnicas de Campo" rows="3"></v-textarea>
+                        </v-col>
+                    </v-row>
+                    <button type="submit" style="display:none"></button>
+                </v-card-text>
+                <v-card-actions>
+                    <v-spacer></v-spacer>
+                    <v-btn @click="showDialog = false">Cerrar</v-btn>
+                    <v-btn color="primary" type="submit" form="otForm" :loading="saving">Guardar Avances</v-btn>
+                </v-card-actions>
+            </v-form>
         </v-card>
     </v-dialog>
   </v-container>
@@ -80,6 +87,7 @@ import { formatDate } from '@/utils/format';
 const authStore = useAuthStore();
 
 const orders = ref([]);
+const search = ref('');
 const loading = ref(true);
 const saving = ref(false);
 const showDialog = ref(false);

@@ -56,11 +56,15 @@
 
         <!-- Usage History -->
         <v-card class="mt-4">
-          <v-card-title>Historial de Uso</v-card-title>
+          <v-card-title class="d-flex justify-space-between align-center">
+            <span>Historial de Uso</span>
+            <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Buscar uso..." hide-details density="compact" variant="solo-filled" style="max-width: 250px;"></v-text-field>
+          </v-card-title>
           <v-data-table
             :headers="usageHeaders"
             :items="usages"
             :loading="loadingUsages"
+            :search="search"
             class="elevation-0"
           >
             <template v-slot:item.used_at="{ item }">
@@ -89,20 +93,23 @@
     <!-- Add Stock Dialog -->
     <v-dialog v-model="addStockDialog" max-width="400">
       <v-card>
-        <v-card-title>Agregar Stock</v-card-title>
-        <v-card-text>
-          <v-text-field
-            v-model.number="stockToAdd"
-            label="Cantidad a agregar"
-            type="number"
-            min="1"
-          ></v-text-field>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn @click="addStockDialog = false">Cancelar</v-btn>
-          <v-btn color="primary" @click="addStock" :loading="addingStock">Agregar</v-btn>
-        </v-card-actions>
+        <v-form @submit.prevent="addStock" id="addStockForm">
+            <v-card-title>Agregar Stock</v-card-title>
+            <v-card-text>
+              <v-text-field
+                v-model.number="stockToAdd"
+                label="Cantidad a agregar"
+                type="number"
+                min="1"
+              ></v-text-field>
+              <button type="submit" style="display:none"></button>
+            </v-card-text>
+            <v-card-actions>
+              <v-spacer></v-spacer>
+              <v-btn @click="addStockDialog = false">Cancelar</v-btn>
+              <v-btn color="primary" type="submit" form="addStockForm" :loading="addingStock">Agregar</v-btn>
+            </v-card-actions>
+        </v-form>
       </v-card>
     </v-dialog>
   </v-container>
@@ -116,6 +123,7 @@ import api from '@/services/api';
 const route = useRoute();
 const part = ref(null);
 const usages = ref([]);
+const search = ref('');
 const loadingUsages = ref(false);
 const editMode = ref(false);
 

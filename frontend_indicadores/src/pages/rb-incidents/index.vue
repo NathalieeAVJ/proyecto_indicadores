@@ -1,9 +1,10 @@
 <template>
   <v-container>
     <v-row class="mb-4">
-      <v-col cols="12" md="8" class="d-flex align-center">
+      <v-col cols="12" md="12" class="d-flex align-center">
         <v-text-field v-model="startDate" type="date" label="Desde" hide-details class="mr-2" density="compact" @change="fetchIncidents"></v-text-field>
         <v-text-field v-model="endDate" type="date" label="Hasta" hide-details class="mr-2" density="compact" @change="fetchIncidents"></v-text-field>
+        <v-text-field v-model="search" prepend-inner-icon="mdi-magnify" label="Buscador por radiobase o asunto..." hide-details density="compact" variant="solo-filled" class="mr-2"></v-text-field>
         <v-btn icon="mdi-refresh" @click="fetchIncidents" variant="text"></v-btn>
       </v-col>
       <v-col cols="12" md="4" class="text-right d-flex align-center justify-end">
@@ -17,6 +18,7 @@
         :headers="headers"
         :items="incidents"
         :loading="loadingTable"
+        :search="search"
         class="elevation-0"
       >
         <template v-slot:item.status="{ item }">
@@ -50,7 +52,7 @@
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text class="pa-6">
-          <v-form @submit.prevent="saveItem" ref="formRef">
+          <v-form @submit.prevent="saveItem" ref="formRef" id="rbIncidentForm">
             <v-text-field v-model="form.title" label="Asunto / Resumen de la Falla" required :rules="[v => !!v || 'Requerido']"></v-text-field>
             
             <v-row>
@@ -152,12 +154,13 @@
                 </v-card>
               </div>
             </v-expand-transition>
+            <button type="submit" style="display:none"></button>
           </v-form>
         </v-card-text>
         <v-card-actions class="pa-4">
           <v-spacer></v-spacer>
           <v-btn color="grey" variant="text" @click="dialog = false">Cancelar</v-btn>
-          <v-btn color="primary" @click="saveItem" :loading="saving">
+          <v-btn color="primary" type="submit" form="rbIncidentForm" :loading="saving">
             {{ isEdit ? 'Actualizar' : 'Reportar' }}
           </v-btn>
         </v-card-actions>
@@ -191,6 +194,7 @@ const originalStatus = ref('');
 
 const startDate = ref('');
 const endDate = ref('');
+const search = ref('');
 
 const form = ref({
   title: '', radio_base: null, failure_type: null, description: '',

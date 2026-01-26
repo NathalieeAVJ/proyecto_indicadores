@@ -9,7 +9,7 @@ class AuditLogSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = AuditLog
-        fields = ['id', 'username', 'full_name', 'action', 'module', 'description', 'ip_address', 'created_at']
+        fields = ['id', 'username', 'full_name', 'action', 'module', 'object_id', 'description', 'ip_address', 'created_at']
 
     def get_full_name(self, obj):
         if obj.user:
@@ -25,7 +25,19 @@ class AuditLogViewSet(viewsets.ReadOnlyModelViewSet):
         # STRICT ROLE CHECK: Only 'admin' role can see logs
         if self.request.user.role != 'admin':
             return AuditLog.objects.none()
-        return super().get_queryset()
+        
+        queryset = super().get_queryset()
+        
+        # Filtering
+        module = self.request.query_params.get('module')
+        if module:
+            queryset = queryset.filter(module=module)
+            
+        object_id = self.request.query_params.get('object_id')
+        if object_id:
+            queryset = queryset.filter(object_id=object_id)
+            
+        return queryset
 
     @action(detail=False, methods=['post'])
     def create_manual(self, request):

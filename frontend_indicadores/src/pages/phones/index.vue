@@ -11,7 +11,19 @@
     </v-row>
 
     <v-card>
-      <v-data-table :headers="headers" :items="phones" :loading="loadingTable" class="elevation-1">
+      <v-card-title>
+        <v-text-field
+          v-model="search"
+          prepend-inner-icon="mdi-magnify"
+          label="Buscar por número, descripción o depto..."
+          single-line
+          hide-details
+          variant="solo-filled"
+          density="compact"
+          class="pa-2"
+        ></v-text-field>
+      </v-card-title>
+      <v-data-table :headers="headers" :items="phones" :loading="loadingTable" :search="search" class="elevation-1">
         <template v-slot:item.actions="{ item }">
           <v-btn icon size="small" variant="text" color="primary" class="me-2" @click="openDialog(item)">
             <v-icon>mdi-pencil</v-icon>
@@ -30,7 +42,7 @@
           {{ isEdit ? 'Editar Número' : 'Nuevo Número' }}
         </v-card-title>
         <v-card-text>
-          <v-form @submit.prevent="saveItem" ref="formRef">
+          <v-form @submit.prevent="saveItem" ref="formRef" id="phoneForm">
             <v-text-field
               v-model="form.number"
               label="Número Telefónico"
@@ -49,12 +61,13 @@
               v-model="form.location"
               label="Ubicación"
             ></v-text-field>
+            <button type="submit" style="display:none"></button>
           </v-form>
         </v-card-text>
         <v-card-actions>
           <v-spacer></v-spacer>
           <v-btn variant="text" @click="dialog = false">Cancelar</v-btn>
-          <v-btn color="primary" @click="saveItem" :loading="saving">
+          <v-btn color="primary" type="submit" form="phoneForm" :loading="saving">
             {{ isEdit ? 'Actualizar' : 'Guardar' }}
           </v-btn>
         </v-card-actions>
@@ -68,6 +81,7 @@ import { ref, onMounted } from 'vue';
 import api from '@/services/api';
 
 const phones = ref([]);
+const search = ref('');
 const loadingTable = ref(false);
 const dialog = ref(false);
 const saving = ref(false);

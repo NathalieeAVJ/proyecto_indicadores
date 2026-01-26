@@ -10,7 +10,19 @@
     </v-row>
 
     <v-card elevation="2">
-      <v-data-table :headers="headers" :items="users" :loading="loadingTable" class="elevation-0">
+      <v-card-title>
+        <v-text-field
+          v-model="search"
+          prepend-inner-icon="mdi-magnify"
+          label="Buscar usuario o empleado..."
+          single-line
+          hide-details
+          variant="solo-filled"
+          density="compact"
+          class="pa-2"
+        ></v-text-field>
+      </v-card-title>
+      <v-data-table :headers="headers" :items="users" :loading="loadingTable" :search="search" class="elevation-0">
         <template v-slot:item.date_joined="{ item }">
           {{ formatDate(item.date_joined) }}
         </template>
@@ -41,7 +53,7 @@
         </v-card-title>
         <v-divider></v-divider>
         <v-card-text class="pa-6">
-          <v-form @submit.prevent="saveItem" ref="formRef">
+          <v-form @submit.prevent="saveItem" ref="formRef" id="userForm">
             <v-autocomplete
               v-if="!isEdit"
               v-model="form.employee_id"
@@ -79,12 +91,13 @@
               label="Rol del Sistema"
               required
             ></v-select>
+            <button type="submit" style="display:none"></button>
           </v-form>
         </v-card-text>
         <v-card-actions class="pa-4">
           <v-spacer></v-spacer>
           <v-btn color="grey" variant="text" @click="dialog = false">Cancelar</v-btn>
-          <v-btn color="primary" @click="saveItem" :loading="saving">
+          <v-btn color="primary" type="submit" form="userForm" :loading="saving">
             {{ isEdit ? 'Actualizar' : 'Guardar' }}
           </v-btn>
         </v-card-actions>
@@ -94,21 +107,22 @@
     <!-- PASSWORD RESET DIALOG -->
     <v-dialog v-model="passwordDialog" max-width="400">
       <v-card>
-        <v-card-title>Cambiar Contraseña</v-card-title>
-        <v-card-text>
-          <p class="mb-4">Usuario: <strong>{{ selectedUser?.username }}</strong></p>
-          <v-text-field
-            v-model="newPassword"
-            label="Nueva Contraseña"
-            type="password"
-            required
-          ></v-text-field>
-        </v-card-text>
-        <v-card-actions>
-          <v-spacer></v-spacer>
-          <v-btn variant="text" @click="passwordDialog = false">Cancelar</v-btn>
-          <v-btn color="warning" @click="resetPassword" :loading="saving">Cambiar</v-btn>
-        </v-card-actions>
+        <v-form @submit.prevent="resetPassword" id="passwordForm">
+          <v-card-text>
+            <p class="mb-4">Usuario: <strong>{{ selectedUser?.username }}</strong></p>
+            <v-text-field
+              v-model="newPassword"
+              label="Nueva Contraseña"
+              type="password"
+              required
+            ></v-text-field>
+          </v-card-text>
+          <v-card-actions>
+            <v-spacer></v-spacer>
+            <v-btn variant="text" @click="passwordDialog = false">Cancelar</v-btn>
+            <v-btn color="warning" type="submit" form="passwordForm" :loading="saving">Cambiar</v-btn>
+          </v-card-actions>
+        </v-form>
       </v-card>
     </v-dialog>
   </v-container>
@@ -121,6 +135,7 @@ import { formatDate } from '@/utils/format';
 
 const users = ref([]);
 const availableEmployees = ref([]);
+const search = ref('');
 const loadingTable = ref(true);
 const dialog = ref(false);
 const passwordDialog = ref(false);

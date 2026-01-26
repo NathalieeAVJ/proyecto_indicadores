@@ -19,35 +19,42 @@ declare module 'vue-router/auto-routes' {
    */
   export interface RouteNamedMap {
     '/': RouteRecordInfo<'/', '/', Record<never, never>, Record<never, never>>,
+    '/analytics/performance': RouteRecordInfo<'/analytics/performance', '/analytics/performance', Record<never, never>, Record<never, never>>,
+    '/approvals/': RouteRecordInfo<'/approvals/', '/approvals', Record<never, never>, Record<never, never>>,
     '/audit/': RouteRecordInfo<'/audit/', '/audit', Record<never, never>, Record<never, never>>,
+    '/auditor/': RouteRecordInfo<'/auditor/', '/auditor', Record<never, never>, Record<never, never>>,
     '/budgets/': RouteRecordInfo<'/budgets/', '/budgets', Record<never, never>, Record<never, never>>,
     '/budgets/[id]': RouteRecordInfo<'/budgets/[id]', '/budgets/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
+    '/departments/': RouteRecordInfo<'/departments/', '/departments', Record<never, never>, Record<never, never>>,
+    '/departments/org-chart': RouteRecordInfo<'/departments/org-chart', '/departments/org-chart', Record<never, never>, Record<never, never>>,
+    '/documentos/': RouteRecordInfo<'/documentos/', '/documentos', Record<never, never>, Record<never, never>>,
     '/employees/': RouteRecordInfo<'/employees/', '/employees', Record<never, never>, Record<never, never>>,
     '/employees/[id]': RouteRecordInfo<'/employees/[id]', '/employees/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
-    '/employees/create': RouteRecordInfo<'/employees/create', '/employees/create', Record<never, never>, Record<never, never>>,
     '/failure-types/': RouteRecordInfo<'/failure-types/', '/failure-types', Record<never, never>, Record<never, never>>,
     '/failure-types/[id]': RouteRecordInfo<'/failure-types/[id]', '/failure-types/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
-    '/failure-types/create': RouteRecordInfo<'/failure-types/create', '/failure-types/create', Record<never, never>, Record<never, never>>,
+    '/help/manual': RouteRecordInfo<'/help/manual', '/help/manual', Record<never, never>, Record<never, never>>,
     '/incidents/': RouteRecordInfo<'/incidents/', '/incidents', Record<never, never>, Record<never, never>>,
     '/incidents/[id]': RouteRecordInfo<'/incidents/[id]', '/incidents/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
-    '/incidents/create': RouteRecordInfo<'/incidents/create', '/incidents/create', Record<never, never>, Record<never, never>>,
+    '/inventory/assets': RouteRecordInfo<'/inventory/assets', '/inventory/assets', Record<never, never>, Record<never, never>>,
     '/login': RouteRecordInfo<'/login', '/login', Record<never, never>, Record<never, never>>,
+    '/logistica/fleet': RouteRecordInfo<'/logistica/fleet', '/logistica/fleet', Record<never, never>, Record<never, never>>,
     '/payroll/': RouteRecordInfo<'/payroll/', '/payroll', Record<never, never>, Record<never, never>>,
     '/phones/': RouteRecordInfo<'/phones/', '/phones', Record<never, never>, Record<never, never>>,
     '/phones/[id]': RouteRecordInfo<'/phones/[id]', '/phones/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
-    '/phones/create': RouteRecordInfo<'/phones/create', '/phones/create', Record<never, never>, Record<never, never>>,
+    '/procura/suppliers': RouteRecordInfo<'/procura/suppliers', '/procura/suppliers', Record<never, never>, Record<never, never>>,
     '/radio-bases/': RouteRecordInfo<'/radio-bases/', '/radio-bases', Record<never, never>, Record<never, never>>,
     '/radio-bases/[id]': RouteRecordInfo<'/radio-bases/[id]', '/radio-bases/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
-    '/radio-bases/create': RouteRecordInfo<'/radio-bases/create', '/radio-bases/create', Record<never, never>, Record<never, never>>,
     '/rb-incidents/': RouteRecordInfo<'/rb-incidents/', '/rb-incidents', Record<never, never>, Record<never, never>>,
     '/rb-incidents/[id]': RouteRecordInfo<'/rb-incidents/[id]', '/rb-incidents/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
-    '/rb-incidents/create': RouteRecordInfo<'/rb-incidents/create', '/rb-incidents/create', Record<never, never>, Record<never, never>>,
+    '/rrhh/blacklist': RouteRecordInfo<'/rrhh/blacklist', '/rrhh/blacklist', Record<never, never>, Record<never, never>>,
+    '/self-service/': RouteRecordInfo<'/self-service/', '/self-service', Record<never, never>, Record<never, never>>,
     '/spare-parts/': RouteRecordInfo<'/spare-parts/', '/spare-parts', Record<never, never>, Record<never, never>>,
     '/spare-parts/[id]': RouteRecordInfo<'/spare-parts/[id]', '/spare-parts/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
     '/users/': RouteRecordInfo<'/users/', '/users', Record<never, never>, Record<never, never>>,
     '/users/[id]': RouteRecordInfo<'/users/[id]', '/users/:id', { id: ParamValue<true> }, { id: ParamValue<false> }>,
-    '/users/create': RouteRecordInfo<'/users/create', '/users/create', Record<never, never>, Record<never, never>>,
     '/users/me': RouteRecordInfo<'/users/me', '/users/me', Record<never, never>, Record<never, never>>,
+    '/ventas/': RouteRecordInfo<'/ventas/', '/ventas', Record<never, never>, Record<never, never>>,
+    '/wiki/': RouteRecordInfo<'/wiki/', '/wiki', Record<never, never>, Record<never, never>>,
     '/work-orders/': RouteRecordInfo<'/work-orders/', '/work-orders', Record<never, never>, Record<never, never>>,
   }
 
@@ -66,8 +73,20 @@ declare module 'vue-router/auto-routes' {
       routes: '/'
       views: never
     }
+    'src/pages/analytics/performance.vue': {
+      routes: '/analytics/performance'
+      views: never
+    }
+    'src/pages/approvals/index.vue': {
+      routes: '/approvals/'
+      views: never
+    }
     'src/pages/audit/index.vue': {
       routes: '/audit/'
+      views: never
+    }
+    'src/pages/auditor/index.vue': {
+      routes: '/auditor/'
       views: never
     }
     'src/pages/budgets/index.vue': {
@@ -78,16 +97,24 @@ declare module 'vue-router/auto-routes' {
       routes: '/budgets/[id]'
       views: never
     }
+    'src/pages/departments/index.vue': {
+      routes: '/departments/'
+      views: never
+    }
+    'src/pages/departments/org-chart.vue': {
+      routes: '/departments/org-chart'
+      views: never
+    }
+    'src/pages/documentos/index.vue': {
+      routes: '/documentos/'
+      views: never
+    }
     'src/pages/employees/index.vue': {
       routes: '/employees/'
       views: never
     }
     'src/pages/employees/[id].vue': {
       routes: '/employees/[id]'
-      views: never
-    }
-    'src/pages/employees/create.vue': {
-      routes: '/employees/create'
       views: never
     }
     'src/pages/failure-types/index.vue': {
@@ -98,8 +125,8 @@ declare module 'vue-router/auto-routes' {
       routes: '/failure-types/[id]'
       views: never
     }
-    'src/pages/failure-types/create.vue': {
-      routes: '/failure-types/create'
+    'src/pages/help/manual.vue': {
+      routes: '/help/manual'
       views: never
     }
     'src/pages/incidents/index.vue': {
@@ -110,12 +137,16 @@ declare module 'vue-router/auto-routes' {
       routes: '/incidents/[id]'
       views: never
     }
-    'src/pages/incidents/create.vue': {
-      routes: '/incidents/create'
+    'src/pages/inventory/assets.vue': {
+      routes: '/inventory/assets'
       views: never
     }
     'src/pages/login.vue': {
       routes: '/login'
+      views: never
+    }
+    'src/pages/logistica/fleet.vue': {
+      routes: '/logistica/fleet'
       views: never
     }
     'src/pages/payroll/index.vue': {
@@ -130,8 +161,8 @@ declare module 'vue-router/auto-routes' {
       routes: '/phones/[id]'
       views: never
     }
-    'src/pages/phones/create.vue': {
-      routes: '/phones/create'
+    'src/pages/procura/suppliers.vue': {
+      routes: '/procura/suppliers'
       views: never
     }
     'src/pages/radio-bases/index.vue': {
@@ -142,10 +173,6 @@ declare module 'vue-router/auto-routes' {
       routes: '/radio-bases/[id]'
       views: never
     }
-    'src/pages/radio-bases/create.vue': {
-      routes: '/radio-bases/create'
-      views: never
-    }
     'src/pages/rb-incidents/index.vue': {
       routes: '/rb-incidents/'
       views: never
@@ -154,8 +181,12 @@ declare module 'vue-router/auto-routes' {
       routes: '/rb-incidents/[id]'
       views: never
     }
-    'src/pages/rb-incidents/create.vue': {
-      routes: '/rb-incidents/create'
+    'src/pages/rrhh/blacklist.vue': {
+      routes: '/rrhh/blacklist'
+      views: never
+    }
+    'src/pages/self-service/index.vue': {
+      routes: '/self-service/'
       views: never
     }
     'src/pages/spare-parts/index.vue': {
@@ -174,12 +205,16 @@ declare module 'vue-router/auto-routes' {
       routes: '/users/[id]'
       views: never
     }
-    'src/pages/users/create.vue': {
-      routes: '/users/create'
-      views: never
-    }
     'src/pages/users/me.vue': {
       routes: '/users/me'
+      views: never
+    }
+    'src/pages/ventas/index.vue': {
+      routes: '/ventas/'
+      views: never
+    }
+    'src/pages/wiki/index.vue': {
+      routes: '/wiki/'
       views: never
     }
     'src/pages/work-orders/index.vue': {

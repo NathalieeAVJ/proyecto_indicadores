@@ -64,8 +64,12 @@
                 </v-card-text>
             </v-card>
 
-            <v-card title="Historial de Mis Recibos" class="rounded-lg elevation-2">
-                <v-data-table :headers="payHeaders" :items="payrolls" :loading="loadingPay" density="compact">
+            <v-card class="rounded-lg elevation-2">
+                <v-card-title class="d-flex justify-space-between align-center px-4 pt-4">
+                    <span>Historial de Mis Recibos</span>
+                    <v-text-field v-model="searchPay" prepend-inner-icon="mdi-magnify" label="Buscar por periodo o monto..." hide-details density="compact" variant="solo-filled" style="max-width: 250px;"></v-text-field>
+                </v-card-title>
+                <v-data-table :headers="payHeaders" :items="payrolls" :loading="loadingPay" :search="searchPay" density="compact">
                     <template v-slot:item.period="{ item }">
                         {{ item.period_month }}/{{ item.period_year }}
                     </template>
@@ -96,6 +100,7 @@ import { generateWorkLetter, generatePayStub } from '@/utils/reports';
 const authStore = useAuthStore();
 const employee = ref(null);
 const payrolls = ref([]);
+const searchPay = ref('');
 const loading = ref(true);
 const loadingPay = ref(false);
 const exporting = ref(false);
