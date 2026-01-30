@@ -99,4 +99,10 @@ npm run dev
 
 ---
 
+## 📄 Licencia
+
+Este proyecto está bajo la Licencia **GNU General Public License v3.0 (GPL-3.0)**. Consulte el archivo [LICENSE](LICENSE) para obtener más detalles.
+
+---
+
 © 2026 NatTelf - Desarrollado por Nathaliee Vargas.
