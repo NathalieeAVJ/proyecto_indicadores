@@ -1,47 +1,102 @@
-Sistema de Gestión de Incidencias
+# 📡 NatTelf - Sistema de Gestión de Indicadores
 
-Autor: Nathaliee Vargas Nathalex000@gmail.com
+> [!NOTE]
+> **NatTelf es una empresa ficticia** creada con fines de demostración de Diseño, Técnica y Desarrollo de Software.
 
-Este proyecto es una solución integral para la gestión y seguimiento de incidencias de líneas telefónicas, diseñado para optimizar los tiempos de respuesta y organizar el flujo de trabajo técnico.
+**NatTelf** es una plataforma robusta de **Gestión Empresarial (ERP/CRM)** diseñada específicamente para empresas del sector de **Telecomunicaciones**.
 
-🚀 Tecnologías Utilizadas
-Backend: Django (Python) - REST API.
+### 🎯 ¿Para qué funciona este sistema?
 
-Frontend: Vue.js con Vuetify (Material Design Components).
+Este sistema actúa como el núcleo operativo de la empresa, permitiendo:
 
-Base de Datos: PostgreSQL / SQLite.
+1.  **Monitoreo Técnico en Tiempo Real**: Centraliza el reporte y seguimiento de averías en líneas telefónicas y radiobases, optimizando los tiempos de respuesta del equipo técnico.
+2.  **Gestión de Infraestructura**: Mapeo dinámico y control de estado de estaciones (Radiobases) para asegurar la continuidad del servicio de red.
+3.  **Control de Activos e Inventario**: Supervisa el stock de repuestos críticos y la asignación de equipos de trabajo (laptops, teléfonos, herramientas) a los empleados.
+4.  **Administración de Operaciones Logísticas**: Registro de mantenimiento preventivo y correctivo de la flota de vehículos, control de combustible y gastos operativos.
+5.  **Ciclo Completo de Ventas**: Desde la gestión del stock de SIM Cards (físicas y eSIM) hasta el registro de ventas finales a clientes.
+6.  **Gestión de Capital Humano (RRHH)**: Control de expedientes de empleados, jerarquías departamentales y procesamiento de nómina histórica.
+7.  **Organización Documental y de Conocimiento**: Repositorio central de contratos y documentos legales con control de versiones, además de una Wiki interna para capacitación técnica.
 
-Herramientas: Debian 12 (Entorno de desarrollo), Git.
+En resumen, **NatTelf** transforma datos operativos en información visual y accionable, eliminando el desorden administrativo y permitiendo a la gerencia tomar decisiones basadas en métricas reales de productividad y fallas.
 
-✨ Características Principales
-Panel de Control (Dashboard): Visualización de métricas de incidencias en tiempo real.
+---
 
-Gestión de Tickets: Registro, asignación y seguimiento de estados de fallas en líneas.
+## 📸 Galería de Interfaces (UI Design)
 
-Interfaz Responsiva: Diseñada con Vuetify para una experiencia fluida en cualquier dispositivo.
+A continuación, se presenta una muestra del diseño y las capacidades del sistema:
 
-Autenticación y Roles: Manejo de usuarios según niveles de acceso.
+### 📊 Dashboard de Gestión
 
-🛠️ Instalación y Configuración
-Prerrequisitos: Python 3.x, Node.js y npm.
+Visualización en tiempo real de métricas críticas, estados de tickets y distribución de fallas.
+![Dashboard](docs/images/dashboard.png)
 
-Clonar el repositorio:
+### 🎫 Gestión de Incidencias (Tel)
 
-Bash
-git clone https://github.com/tu-usuario/tu-repositorio.git
-cd tu-repositorio
-Configuración del Backend (Django):
+Control detallado de averías telefónicas, asignación de técnicos y seguimiento de ciclos de solución.
+![Incidencias](docs/images/incidencias.png)
 
-Bash
-cd backend
+### 📦 Inventario de Repuestos
+
+Gestión de stock, control de costos y alertas de inventario bajo para mantenimiento preventivo.
+![Inventario](docs/images/inventario.png)
+
+### 👥 Gestión de Personal (RRHH)
+
+Estructura organizativa, gestión de expedientes y control de nómina del equipo técnico.
+![RRHH](docs/images/rrhh.png)
+
+---
+
+## 🛠️ Arquitectura y Tecnologías
+
+El sistema está construido bajo una robusta arquitectura desacoplada:
+
+- **Backend**: Python 3.11 + **Django 6.0** + Django REST Framework.
+  - Base de Datos: MySQL/MariaDB.
+  - Seguridad: Autenticación por Tokens e Historial de Auditoría Simple.
+- **Frontend**: **Vue.js 3** + **Vite 6** + **Vuetify 3**.
+  - Diseño: Material Design con estética personalizada "Purple Premium".
+  - Gestión de Estado: Pinia.
+- **Reportes**: Generación dinámica de PDF (jspdf) y exportación a Excel.
+
+## ✨ Funcionalidades Clave
+
+1. **Dashboard Multidimensional**: Filtros temporales y gráficos interactivos (ApexCharts/Chart.js).
+2. **Gestión de Infraestructura**: Registro y monitoreo de Radiobases con geolocalización.
+3. **Control Logístico**: Seguimiento de vehículos, combustible y mantenimiento de flota.
+4. **Módulo de Ventas**: Control de SIM Cards (Físicas/eSIM) y gestión de clientes.
+5. **Repositorio Documental**: Almacenamiento organizado con control de versiones.
+6. **Base de Conocimientos (Wiki)**: Artículos técnicos para soporte de primer nivel.
+
+---
+
+## 🚀 Guía de Instalación Rápida
+
+### Requisitos
+
+- Python 3.11+
+- Node.js 18+
+- MariaDB / MySQL
+
+### Backend
+
+```bash
+cd Backend_Indicadores
 python -m venv venv
-source venv/bin/activate # En Linux/Debian
+source venv/bin/activate
 pip install -r requirements.txt
 python manage.py migrate
 python manage.py runserver
-Configuración del Frontend (Vue.js):
+```
 
-Bash
-cd frontend
+### Frontend
+
+```bash
+cd frontend_indicadores
 npm install
-npm run serve
+npm run dev
+```
+
+---
+
+© 2026 NatTelf - Desarrollado por Nathaliee Vargas.
