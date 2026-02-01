@@ -102,35 +102,8 @@
       <v-spacer></v-spacer>
 
       <!-- Notifications -->
-      <v-menu v-if="authStore.isAuthenticated" :close-on-content-click="false" location="bottom end">
-        <template v-slot:activator="{ props }">
-          <v-btn icon v-bind="props" class="mr-2">
-            <v-badge :content="unreadCount" :model-value="unreadCount > 0" color="error">
-              <v-icon>mdi-bell</v-icon>
-            </v-badge>
-          </v-btn>
-        </template>
-        <v-card width="350">
-          <v-list lines="three">
-            <v-list-subheader class="d-flex align-center">
-              Notificaciones
-              <v-spacer></v-spacer>
-              <v-btn variant="text" size="x-small" color="primary" @click="readAll">Marcar todo leido</v-btn>
-            </v-list-subheader>
-            <v-divider></v-divider>
-            <v-list-item v-for="notif in notifications" :key="notif.id" :title="notif.title" :class="{'bg-soft-purple': !notif.is_read}" @click="goToNotif(notif)">
-                <template v-slot:subtitle>
-                    <div class="text-caption text-grey">{{ formatDate(notif.created_at) }}</div>
-                    <div>{{ notif.message }}</div>
-                </template>
-                <template v-slot:prepend>
-                    <v-icon :color="notif.is_read ? 'grey' : 'primary'">mdi-circle-small</v-icon>
-                </template>
-            </v-list-item>
-            <v-list-item v-if="notifications.length === 0" title="Sin notificaciones"></v-list-item>
-          </v-list>
-        </v-card>
-      </v-menu>
+      <!-- Notifications -->
+      <NotificationBell v-if="authStore.isAuthenticated" />
 
       <v-menu v-if="authStore.isAuthenticated" min-width="200px" rounded>
         <template v-slot:activator="{ props }">
@@ -202,6 +175,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { useAuthStore } from '@/stores/auth';
 import { useRouter } from 'vue-router';
 import api from '@/services/api';
+import NotificationBell from '@/components/NotificationBell.vue';
 
 const drawer = ref(false);
 const authStore = useAuthStore();
@@ -256,42 +230,9 @@ const logout = () => {
   authStore.logout();
   router.push('/login');
 };
-const notifications = ref([]);
-const unreadCount = computed(() => notifications.value.filter(n => !n.is_read).length);
-
-const formatDate = (dateStr) => {
-    if (!dateStr) return '';
-    return new Date(dateStr).toLocaleString();
-};
-
-const fetchNotifications = async () => {
-  if (authStore.isAuthenticated) {
-    try {
-      notifications.value = await api.get('notifications/');
-    } catch (e) {
-      console.error(e);
-    }
-  }
-};
-
-const readAll = async () => {
-  await api.post('notifications/mark_all_read/');
-  fetchNotifications();
-};
-
-const goToNotif = async (notif) => {
-  if (!notif.is_read) {
-    await api.patch(`notifications/${notif.id}/`, { is_read: true });
-  }
-  if (notif.link) router.push(notif.link);
-  fetchNotifications();
-};
 
 onMounted(() => {
-  fetchNotifications();
   startSessionTimer();
-  // Poll every 60s
-  setInterval(fetchNotifications, 60000);
 });
 </script>
 
