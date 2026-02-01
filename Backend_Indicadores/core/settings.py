@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'ventas',
     'simple_history',
     'import_export',
+    'dashboard',
 ]
 
 AUTH_USER_MODEL = 'users.User'

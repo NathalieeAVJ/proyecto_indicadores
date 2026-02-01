@@ -1,0 +1,11 @@
+image: python:3.11
+
+stages:
+  - test
+
+test_backend:
+  stage: test
+  script:
+    - cd Backend_Indicadores
+    - pip install -r requirements.txt
+    - python manage.py test dashboard

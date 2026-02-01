@@ -55,4 +55,5 @@ urlpatterns = [
     path('api/v1/documentos/', include('documentos.urls')),
     path('api/v1/procura/', include('procura.urls')),
     path('api/v1/ventas/', include('ventas.urls')),
+    path('api/dashboard/', include('dashboard.urls')),
 ]
