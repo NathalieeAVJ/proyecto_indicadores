@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/6.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -105,12 +106,19 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
         'NAME': 'incidencias_db',
-        'USER': 'root',      # Por defecto suele ser 'root'
+        'USER': 'root',
         'PASSWORD': '12345',
         'HOST': 'localhost',
         'PORT': '3306',
     }
 }
+
+# CI/CD Database Fallback (Use SQLite for Tests)
+if os.getenv('CI') == 'true':
+    DATABASES['default'] = {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
+    }
 
 
 # Password validation
