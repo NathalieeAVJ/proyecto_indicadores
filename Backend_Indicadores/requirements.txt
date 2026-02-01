@@ -1,0 +1,12 @@
+asgiref==3.11.0
+diff-match-patch==20241021
+Django==5.2.10
+django-cors-headers==4.9.0
+django-import-export==4.4.0
+django-simple-history==3.11.0
+djangorestframework==3.16.1
+Faker==40.1.2
+mysqlclient==2.2.7
+pillow==12.1.0
+sqlparse==0.5.5
+tablib==3.9.0
